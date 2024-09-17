@@ -956,7 +956,8 @@ class MyCustomReporter(ReporterBaseClass):
 Пусть эксперимент $\Omega$ описывается таблицей
 
 $$\large \begin{array}{c|c|c|c|c}
-\Omega & \omega_1 & \omega_2 & \dots & \omega_n\\ \hline
+\Omega & \omega_1 & \omega_2 & \dots & \omega_n\\
+\hline
 P & P_1 & P_2 & \dots & P_n
 \end{array}.$$
 
@@ -976,7 +977,8 @@ $$\large H(\Omega) = 0 \iff \exists i \in \{1,2,\dots,n\}: P_i = 1.$$
 * Энтропия $H(\Omega)$ максимальна в случае, когда исходы эксперимента равновозможны:
 
 $$\large \begin{array}{c|c|c|c|c}
-\Omega & \omega_1 & \omega_2 & \dots & \omega_n\\ \hline
+\Omega & \omega_1 & \omega_2 & \dots & \omega_n\\
+\hline
 P & \frac{1}{n} & \frac{1}{n} & \dots & \frac{1}{n}
 \end{array}.$$
 
