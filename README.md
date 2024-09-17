@@ -1,5 +1,22 @@
 # <a id='toc1_'></a>[__sberpunk 0.1__](#toc0_)
 
+**Установка**
+
+Перейти в корневую папку с `setup.py`. Работа `DirectoryScanner` требует экстракторов текста из файлов различных форматов, поэтому установка тяжелых зависимостей для него организована как _extra_. Если `DirectoryScanner` использоваться не будет:
+```
+pip install .
+```
+Если `DirectoryScanner` использоваться будет, в дополнение к команде выше:
+```
+pip install .[directory_scanner]
+```
+
+Установка с github:
+```
+pip install git+https://github.com/EvgenyMeredelin/sberpunk.git
+pip install "sberpunk[directory_scanner] @ git+https://github.com/EvgenyMeredelin/sberpunk.git"
+```
+
 **Содержание**<a id='toc0_'></a>
 - [__sberpunk 0.1__](#toc1_)
   - [__Пример работы класса `DirectoryScanner`__](#toc1_1_)
