@@ -130,7 +130,7 @@ class SberProcess:
 
         if (actions < 0).any() or (fails < 0).any():
             msg = (
-                "Neither total number of actions nor number of fails can't be "
+                "Neither total number of actions nor number of fails can be "
                 "negative"
             )
             raise ValueError(msg)
