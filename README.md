@@ -18,7 +18,7 @@ pip install "sberpunk[directory_scanner] @ git+https://github.com/EvgenyMeredeli
 ```
 
 **Содержание**<a id='toc0_'></a>
-- [__sberpunk 0.1__](#toc1_)
+- [__sberpunk 0.2__](#toc1_)
   - [__Пример работы класса `DirectoryScanner`__](#toc1_1_)
     - [__Постановка задачи__](#toc1_1_1_)
     - [__Источники текстов__](#toc1_1_2_)
@@ -48,9 +48,9 @@ pip install "sberpunk[directory_scanner] @ git+https://github.com/EvgenyMeredeli
     - [__Инициализация объекта класса `QueteletIndex`__](#toc1_4_2_)
     - [__Как это работает__](#toc1_4_3_)
     - [__Выводы__](#toc1_4_4_)
-  - [__Пример работы с классом `Process`__](#toc1_5_)
+  - [__Пример работы с классом `SberProcess`__](#toc1_5_)
     - [__Постановка задачи__](#toc1_5_1_)
-    - [__Инициализация объекта класса `Process`__](#toc1_5_2_)
+    - [__Инициализация объекта класса `SberProcess`__](#toc1_5_2_)
     - [__Работа с одиночным процессом__](#toc1_5_3_)
     - [__Работа с произвольным количеством процессов__](#toc1_5_4_)
     - [__Практический смысл__](#toc1_5_5_)
@@ -2496,10 +2496,9 @@ $$\large q(\texttt{FAILED} = 1  |  \texttt{EDUCATION} = \texttt{"выпускн�
 * Наиболее оптимистичным значением признака `EDUCATION` — индикатором того, что клиент вернет кредит, является значение _доктор_: ни один из $14$ заемщиков-докторов наук не обманул ожиданий банка. Коэффициент Кетле для данной категории `EDUCATION` равен $-1$, что означает стопроцентный возврат кредита. Имеет место наибольшая связь — концептуальная (логическая). Концептуальная связь усматривается тогда, когда в строке $k$ все немаргинальные величины, кроме одной, скажем, в столбце $l$, равны $0$, что означает, что если объект имеет категорию $k$ первого признака, он заведомо будет иметь категорию $l$ второго признака. Это означает логическую импликацию, или концептуальную связь.
 
 ***
-## <a id='toc1_5_'></a>[__Пример работы с классом `Process`__](#toc0_)
-
+## <a id="toc1_5_"></a>[__Пример работы с классом `SberProcess`__](#toc0_)
 ***
-### <a id='toc1_5_1_'></a>[__Постановка задачи__](#toc0_)
+### <a id="toc1_5_1_"></a>[__Постановка задачи__](#toc0_)
 
 * Имея данные об общем числе испытаний и числе испытаний, завершившихся неудачей, оценить процесс по методике "Шесть сигм":
     * определить класс процесса (_красный_, _желтый_, _зеленый_);
@@ -2509,28 +2508,124 @@ $$\large q(\texttt{FAILED} = 1  |  \texttt{EDUCATION} = \texttt{"выпускн�
 * Требование единообразия интерфейса: для удобства пользователя предусмотреть возможность работать с произвольным количеством процессов как с одним.
 
 ***
-### <a id='toc1_5_2_'></a>[__Инициализация объекта класса `Process`__](#toc0_)
+### <a id="toc1_5_2_"></a>[__Инициализация объекта класса `SberProcess`__](#toc0_)
 
 Параметры:
 
-* `actions` — общее число испытаний. `int | list | numpy.ndarray | pandas.Series`.
+* `classifier` — определитель класса качества процесса по его сигме. `SigmaClassifier`.
 
-* `fails` — число испытаний, завершившихся неудачей. `int | list | numpy.ndarray | pandas.Series`.
+* `actions` — общее число испытаний. `int | float | list | tuple | numpy.ndarray | pandas.Series`.
 
-* `name` — имя процесса. `str | list | numpy.ndarray | pandas.Series | None`. По умолчанию `None`.
+* `fails` — число испытаний, завершившихся неудачей. `int | float | list | tuple | numpy.ndarray | pandas.Series`.
+
+* `name` — имя процесса. `str | list | tuple | numpy.ndarray | pandas.Series | None`. По умолчанию `None`.
 
 ***
-### <a id='toc1_5_3_'></a>[__Работа с одиночным процессом__](#toc0_)
+### <a id="toc1_5_3_"></a>[__Работа с одиночным процессом__](#toc0_)
 
 
 ```python
-from sberpunk.stats import Process
-process = Process(fails=59, actions=500, name='A05. A very important process')
+from sberpunk.stats import (
+    QualityClass,
+    SigmaClassifier,
+    SberProcess
+)
+```
+
+
+```python
+print(QualityClass.__doc__)
+```
+
+
+        Quality class defined by a color label and supremum.
+
+        Attributes:
+            color (str):
+                Quality class color label. Must be a valid `matplotlib` color name.
+
+            supremum (int | float):
+                Unreachable upper bound of the sigma interval that corresponds to
+                the quality class.
+
+                E.g., "red" class never reaches sigma=2.1 supremum which is the
+                exact lower bound of the next, "yellow", class and "yellow" never
+                reaches 4.1 which is the lower bound of the "green" class.
+
+
+
+
+```python
+print(SigmaClassifier.__doc__)
+```
+
+
+        A classifier responsible for getting the quality class color label for a
+        sigma value.
+
+        Attributes:
+            quality_classes (list[QualityClass]):
+                List of `QualityClass` instances defining the classifier. They are
+                not supposed to be sorted by a supremum. A quality class with
+                `float("inf")` supremum is mandatory.
+
+
+
+
+```python
+init_params = [
+    ("red", 2.1),
+    ("yellow", 4.1),
+    ("green", float("inf"))
+]
+
+classifier = SigmaClassifier([
+    QualityClass(*params)
+    for params in init_params
+])
+```
+
+
+```python
+print(SberProcess.__doc__)
+```
+
+
+        Process to evaluate with the "6 sigma" approach.
+
+        Attributes:
+            classifier (SigmaClassifier):
+                A classifier responsible for getting the quality class color label
+                for a given sigma value.
+
+            actions (int | float | list | tuple | numpy.ndarray | pandas.Series):
+                Total number of actions.
+
+            fails (int | float | list | tuple | numpy.ndarray | pandas.Series):
+                Number of actions qualified as failed.
+
+            name (str | list | tuple | numpy.ndarray | pandas.Series | None):
+                Name of the process. Defaults to `None`.
+
+
+
+
+```python
+process = SberProcess(
+    classifier=classifier,
+    actions=500,
+    fails=59,
+    name="A very important process"
+)
+
 process.sigma
 ```
 
 
+
+
     array([2.68504413])
+
 
 
 
@@ -2539,7 +2634,10 @@ process.sigma.item()
 ```
 
 
+
+
     2.68504412790781
+
 
 
 
@@ -2548,7 +2646,10 @@ process.label
 ```
 
 
-    array(['YELLOW'], dtype='<U6')
+
+
+    array(['yellow'], dtype='<U6')
+
 
 
 
@@ -2558,12 +2659,12 @@ process.plot()
 
 
 
-![plot](src/sberpunk/examples/Process/single_process.png)
+![plot](src/sberpunk/examples/SberProcess/single_process.png)
 
 
 
 ***
-### <a id='toc1_5_4_'></a>[__Работа с произвольным количеством процессов__](#toc0_)
+### <a id="toc1_5_4_"></a>[__Работа с произвольным количеством процессов__](#toc0_)
 
 Для демонстрации синтезируем данные:
 
@@ -2577,14 +2678,16 @@ rng = np.random.default_rng(seed=2128506)
 total = rng.integers(low=1, high=10**4, size=(10,))
 
 df = pd.DataFrame({
-    'ok': total - 200,
-    'nok': [200] * 10,
-    'total': total,
-    'process_name': list(string.ascii_letters[:10])
+    "ok": total - 200,
+    "nok": [200] * 10,
+    "total": total,
+    "process_name": list(string.ascii_letters[:10])
 })
 
 df
 ```
+
+
 
 
 <div>
@@ -2675,12 +2778,15 @@ df
 
 
 
+
 ```python
-bulk = Process(df.total, df.nok, df.process_name)
-df['sigma'] = bulk.sigma
-df['label'] = bulk.label
+bulk = SberProcess(classifier, df.total, df.nok, df.process_name)
+df["sigma"] = bulk.sigma
+df["label"] = bulk.label
 df
 ```
+
+
 
 
 <div>
@@ -2704,7 +2810,7 @@ df
       <td>1572</td>
       <td>a</td>
       <td>2.639600</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>1</th>
@@ -2713,7 +2819,7 @@ df
       <td>3929</td>
       <td>b</td>
       <td>3.136155</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>2</th>
@@ -2722,7 +2828,7 @@ df
       <td>6989</td>
       <td>c</td>
       <td>3.401529</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>3</th>
@@ -2731,7 +2837,7 @@ df
       <td>5819</td>
       <td>d</td>
       <td>3.320123</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>4</th>
@@ -2740,7 +2846,7 @@ df
       <td>7405</td>
       <td>e</td>
       <td>3.426696</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>5</th>
@@ -2749,7 +2855,7 @@ df
       <td>643</td>
       <td>f</td>
       <td>1.992899</td>
-      <td>RED</td>
+      <td>red</td>
     </tr>
     <tr>
       <th>6</th>
@@ -2758,7 +2864,7 @@ df
       <td>1519</td>
       <td>g</td>
       <td>2.618552</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>7</th>
@@ -2767,7 +2873,7 @@ df
       <td>260</td>
       <td>h</td>
       <td>0.763684</td>
-      <td>RED</td>
+      <td>red</td>
     </tr>
     <tr>
       <th>8</th>
@@ -2776,7 +2882,7 @@ df
       <td>4103</td>
       <td>i</td>
       <td>3.157148</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
     <tr>
       <th>9</th>
@@ -2785,11 +2891,12 @@ df
       <td>7545</td>
       <td>j</td>
       <td>3.434797</td>
-      <td>YELLOW</td>
+      <td>yellow</td>
     </tr>
   </tbody>
 </table>
 </div>
+
 
 
 
@@ -2799,65 +2906,83 @@ bulk.plot()
 
 
 
-![plot](src/sberpunk/examples/Process/bulk.png)
+![plot](src/sberpunk/examples/SberProcess/bulk.png)
 
 
 
 ***
-### <a id='toc1_5_5_'></a>[__Практический смысл__](#toc0_)
+### <a id="toc1_5_5_"></a>[__Практический смысл__](#toc0_)
 
 
 ```python
 from scipy.stats import norm
-from sberpunk.stats import Threshold
 ```
 
 
 ```python
-ratios = [1 - norm(1.5).cdf(thres.value) for thres in Threshold]
+ratios = [
+    1 - norm(1.5).cdf(quality_class.supremum)
+    for quality_class in classifier
+]
+
 ratios
 ```
 
 
-    [0.27425311775007355, 0.004661188023718732]
 
 
-* дефектов более 274253 на 1 млн действий: класс бездефектности `RED`;
-* от 4662 до 274253: `YELLOW`;
-* менее 4662: `GREEN`.
+    [0.27425311775007355, 0.004661188023718732, 0.0]
 
 
-```python
-Process(10**6, 274254).label
-```
 
-
-    array(['RED'], dtype='<U3')
-
+* дефектов более 274253 на 1 млн действий: класс бездефектности `red`;
+* от 4662 до 274253: `yellow`;
+* менее 4662: `green`.
 
 
 ```python
-Process(10**6, 274253).label
+SberProcess(classifier, actions=10**6, fails=274254).label.item()
 ```
 
 
-    array(['YELLOW'], dtype='<U6')
+
+
+    'red'
+
 
 
 
 ```python
-Process(10**6, 4662).label
+SberProcess(classifier, actions=10**6, fails=274253).label
 ```
 
 
-    array(['YELLOW'], dtype='<U6')
+
+
+    array(['yellow'], dtype='<U6')
+
 
 
 
 ```python
-Process(10**6, 4661).label.item()
+SberProcess(classifier, actions=10**6, fails=4662).label
 ```
 
 
-    'GREEN'
+
+
+    array(['yellow'], dtype='<U6')
+
+
+
+
+```python
+SberProcess(classifier, actions=10**6, fails=4661).label
+```
+
+
+
+
+    array(['green'], dtype='<U5')
+
 
