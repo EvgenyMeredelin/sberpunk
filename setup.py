@@ -3,7 +3,7 @@ from setuptools import find_namespace_packages, setup
 
 setup(
     name='sberpunk',
-    version='0.1',
+    version='0.2',
     packages=find_namespace_packages(where='src'),
     package_dir={'': 'src'},
     package_data={'sberpunk.examples': ['*', '*/*']},

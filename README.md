@@ -1,4 +1,4 @@
-# <a id='toc1_'></a>[__sberpunk 0.1__](#toc0_)
+# <a id='toc1_'></a>[__sberpunk 0.2__](#toc0_)
 
 **Установка**
 
