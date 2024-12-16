@@ -99,7 +99,7 @@ sberpunk/examples/DirectoryScanner/demo files.7z/
 
 
 ```python
-from sberpunk.text.directory_scanner import *
+from sberpunk.directory_scanner import *
 
 # __all__ = [
 #     'DirectoryScanner',
@@ -1118,7 +1118,7 @@ news
 
 
 ```python
-from sberpunk.text import LDATopicModeler, VALID_POS
+from sberpunk.topic_modeling import LDATopicModeler, VALID_POS
 VALID_POS
 ```
 
@@ -1891,7 +1891,7 @@ news_lda.to_json()
 
 
 ```python
-from sberpunk.text import Rag
+from sberpunk.rag import Rag
 ```
 
 
@@ -2272,7 +2272,7 @@ data
 
 
 ```python
-from sberpunk.stats import QueteletIndex
+from sberpunk.quetelet_index import QueteletIndex
 q = QueteletIndex(data.EDUCATION, data.FAILED)
 q.plot()
 ```
@@ -2525,7 +2525,7 @@ $$\large q(\texttt{FAILED} = 1  |  \texttt{EDUCATION} = \texttt{"выпускн�
 
 
 ```python
-from sberpunk.stats import (
+from sberpunk.six_sigma import (
     QualityClass,
     SigmaClassifier,
     SberProcess
