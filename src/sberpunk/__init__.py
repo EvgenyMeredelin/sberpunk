@@ -62,4 +62,4 @@ class EasyPath(Path):
 
 def public_api(obj: Any) -> list[str]:
     """Return object's public API members. """
-    return [attr for attr in dir(obj) if not attr.startswith('_')]
+    return [name for name in dir(obj) if not name.startswith('_')]
